@@ -37,6 +37,8 @@ def geo_dist(lat1, lon1, lat2, lon2):
     return R * c
 
 def geo_similarity(loc1, loc2, max_dist=6e5):
+    if loc1 == loc2:
+        return 1
     if not (loc1 in _gps and loc2 in _gps):
         return 0
     dist = geo_dist(*_gps[loc1], *_gps[loc2])
@@ -45,9 +47,9 @@ def geo_similarity(loc1, loc2, max_dist=6e5):
 # en string similarity (relativ til længste streng)
 def string_similarity_linear(a, b):
     d = editdistance.eval(a, b)
-    return 1 - d / (max(len(a), len(b)))
+    return 1 - d / (max(len(a), len(b), 1))
 
 # en anden (omvendt proportional)
 def string_similarity_inverse(a,b):
     d = editdistance.eval(a,b)
-    return 1 / (1 + (d/(len(a) + len(b))))
+    return 1 / (1 + (d/(1 + len(a) + len(b))))
