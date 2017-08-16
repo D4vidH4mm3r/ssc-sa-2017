@@ -1,7 +1,7 @@
 import pathlib
 import pickle
 import collections
-
+import re
 
 Entry = collections.namedtuple("Entry", "amt,herred,sogn,navn,køn,fødested,fødeår,civilstand,position,erhverv,husstnr,kipnr,løbenr")
 
@@ -25,3 +25,29 @@ class ApprovedMatches:
     def load(self):
         with self.fn.open("rb") as fd:
             self.data = pickle.load(fd)
+
+re_sogn_amt = re.compile(r"(.+) \[?sogn\]?,? ?(.+) \[?amt\]?")
+re_do_sogn = re.compile(r"do \[(.+)\]")
+_trans = {
+    "kjøbenhavn": "københavn",
+    "kiøbenhavn": "københavn",
+    "kbhvn": "københavn",
+    "sverrig": "sverige",
+    "sverige": "sverige",
+    "aarhus": "århus",
+    "aarhuus": "århus",
+    "rønne købstad - bornholms amt": "rønne",
+    "kbhv": "københavn"
+}
+def normalize_more(place):
+    if place in ("do", "do.", "her", "født i sognet", "dito", "sognet", "h. i s."):
+        return None
+    elif place in _trans:
+        return _trans[place]
+    match = re_sogn_amt.match(place)
+    if match:
+        return match.group(1)
+    match = re_do_sogn.match(place)
+    if match:
+        return match.group(1)
+    return place
