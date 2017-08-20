@@ -3,7 +3,11 @@ import pickle
 import collections
 import re
 
-Entry = collections.namedtuple("Entry", "amt,herred,sogn,navn,køn,fødested,fødeår,civilstand,position,erhverv,husstnr,kipnr,løbenr")
+Entry = collections.namedtuple("Entry", "amt,herred,sogn,fornavn,mellemnavn,efternavn,initialer,køn,fødested,fødeår,civilstand,position,erhverv,husstnr,kipnr,løbenr")
+def parseEntry(line):
+    split = line.strip().split("|")
+    split[9] = int(split[9])
+    return Entry(*split)
 
 class ApprovedMatches:
     def __init__(self, fn):
