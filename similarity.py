@@ -53,3 +53,7 @@ def string_similarity_linear(a, b):
 def string_similarity_inverse(a,b):
     d = editdistance.eval(a,b)
     return 1 / (1 + (d/(1 + len(a) + len(b))))
+
+def year_similarity(y1, y2, max_dist=4):
+    # lineært skalering med max
+    return max(0, 1 - (abs(y1 - y2)/max_dist))
