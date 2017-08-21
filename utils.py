@@ -3,12 +3,24 @@ import pickle
 import collections
 import re
 
-Entry = collections.namedtuple("Entry", "amt,herred,sogn,fornavn,mellemnavn,efternavn,initialer,køn,fødested,fødeår,civilstand,position,erhverv,husstnr,kipnr,løbenr")
+
+commonHeader = "amt|herred|sogn|fornavn|middelnavn|efternavn|initialer|køn|fødested|fødeaar|civilstand|position|erhverv|husstnr|kipnr|løbenr"
+# location of data - change on local machine maybe
+datadir = pathlib.Path("../scc/data")
+
+# namedtuple to represent rows
+class Entry(collections.namedtuple("Entry", "amt,herred,sogn,fornavn,mellemnavn,efternavn,initialer,køn,fødested,fødeår,civilstand,position,erhverv,husstnr,kipnr,løbenr")):
+    __slots__ = ()
+    def toRow(entry):
+        return "|".join(str(getattr(entry, field)) for field in entry._fields)
+
+# so far, only birthyear is int
 def parseEntry(line):
     split = line.strip().split("|")
     split[9] = int(split[9])
     return Entry(*split)
 
+# for saving already seen matches - not currently used
 class ApprovedMatches:
     def __init__(self, fn):
         if not isinstance(fn, pathlib.Path):
@@ -30,28 +42,21 @@ class ApprovedMatches:
         with self.fn.open("rb") as fd:
             self.data = pickle.load(fd)
 
-re_sogn_amt = re.compile(r"(.+) \[?sogn\]?,? ?(.+) \[?amt\]?")
-re_do_sogn = re.compile(r"do \[(.+)\]")
-_trans = {
-    "kjøbenhavn": "københavn",
-    "kiøbenhavn": "københavn",
-    "kbhvn": "københavn",
-    "sverrig": "sverige",
-    "sverige": "sverige",
-    "aarhus": "århus",
-    "aarhuus": "århus",
-    "rønne købstad - bornholms amt": "rønne",
-    "kbhv": "københavn"
-}
-def normalize_more(place):
-    if place in ("do", "do.", "her", "født i sognet", "dito", "sognet", "h. i s."):
-        return None
-    elif place in _trans:
-        return _trans[place]
-    match = re_sogn_amt.match(place)
-    if match:
-        return match.group(1)
-    match = re_do_sogn.match(place)
-    if match:
-        return match.group(1)
-    return place
+# context manager pattern (to handle opening and closing - plus streaming)
+class AllEntries():
+    def __enter__(self, files=None):
+        self.files = files if files is not None else sorted(datadir.glob("lc_*.csv"))
+        self.fds = []
+        return self
+
+    def __exit__(self, *stuff):
+        for fd in self.fds:
+            fd.close()
+
+    def getEntries(self):
+        for fn in self.files:
+            year = int(re.search(r"\d{4}", fn.name).group(0))
+            fd = fn.open("r", encoding="UTF-8")
+            self.fds.append(fd)
+            for line in fd:
+                yield (fn, year, (parseEntry(line) for line in fd))
