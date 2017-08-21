@@ -57,8 +57,6 @@ class AllEntries():
         for fn in self.files:
             year = int(re.search(r"\d{4}", fn.name).group(0))
             fd = fn.open("r", encoding="UTF-8")
+            next(fd) # skip header
             self.fds.add(fd)
-            for line in fd:
-                yield (fn, year, (parseEntry(line) for line in fd))
-            fd.close()
-            self.fds.remove(fd)
+            yield (fn, year, (parseEntry(line) for line in fd))
