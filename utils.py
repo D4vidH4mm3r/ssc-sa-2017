@@ -12,7 +12,7 @@ datadir = pathlib.Path("../scc/data")
 class Entry(collections.namedtuple("Entry", "amt,herred,sogn,fornavn,mellemnavn,efternavn,initialer,køn,fødested,fødeår,civilstand,position,erhverv,husstnr,kipnr,løbenr")):
     __slots__ = ()
     def toRow(entry):
-        return "|".join(str(getattr(entry, field)) for field in entry._fields)
+        return "|".join(str(field) for field in iter(entry))
 
 # so far, only birthyear is int
 def parseEntry(line):
@@ -46,7 +46,7 @@ class ApprovedMatches:
 class AllEntries():
     def __enter__(self, files=None):
         self.files = files if files is not None else sorted(datadir.glob("lc_*.csv"))
-        self.fds = []
+        self.fds = set()
         return self
 
     def __exit__(self, *stuff):
@@ -57,6 +57,8 @@ class AllEntries():
         for fn in self.files:
             year = int(re.search(r"\d{4}", fn.name).group(0))
             fd = fn.open("r", encoding="UTF-8")
-            self.fds.append(fd)
+            self.fds.add(fd)
             for line in fd:
                 yield (fn, year, (parseEntry(line) for line in fd))
+            fd.close()
+            self.fds.remove(fd)
