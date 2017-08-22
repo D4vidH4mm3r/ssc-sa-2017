@@ -6,7 +6,7 @@ import re
 
 commonHeader = "amt|herred|sogn|fornavn|middelnavn|efternavn|initialer|køn|fødested|fødeaar|civilstand|position|erhverv|husstnr|kipnr|løbenr"
 # location of data - change on local machine maybe
-datadir = pathlib.Path("../scc/data")
+datadir = pathlib.Path("../main/data")
 
 # namedtuple to represent rows
 class Entry(collections.namedtuple("Entry", "amt,herred,sogn,fornavn,mellemnavn,efternavn,initialer,køn,fødested,fødeår,civilstand,position,erhverv,husstnr,kipnr,løbenr")):
