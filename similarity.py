@@ -10,9 +10,10 @@ import time
 import editdistance
 import random
 import math
+import utils
 
-# ret til
-datadir = pathlib.Path("/home/david/pro/scc/data")
+
+datadir = utils.datadir
 
 with (datadir / "gps-coords.csv").open("r", encoding="utf-8") as fd:
     next(fd)
