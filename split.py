@@ -10,14 +10,26 @@ import pandas
 import csv
 
 
-df = pandas.read_pickle("tmp.pickled") # from cleaning checkpoint
+df = pandas.read_pickle("cleaned.pickled") # from cleaning checkpoint
 
 # **TODO**: Bedre initial-ekstraktion
 
+trans = {
+    "ä": "a", "â": "a",
+    "á": "a", "ë": "e",
+    "è": "e", "é": "e",
+    "ï": "i", "ö": "o",
+    "ü": "u", "í": "i",
+    "ó": "o", "ô": "o",
+    "ú": "u", "ÿ": "y"
+}
+for trash in "!/\\'\".,-:;_0123456789<>=?[]¤÷%()*+…":
+    trans[trash] = ""
+trans = str.maketrans(trans)
 _common_hard_c = set(("cristen", "cristian", "cristine", "carlotte", "catrine",
                     "carl", "caroline", "cathrine", "cirstine", "carel", "catarine"))
 def initial_block(name):
-    name = name.lower()
+    name = name.lower().translate(trans)
     # group k-like sounds with c into k
     if name.startswith("c"):
         if name in _common_hard_c:
@@ -29,9 +41,9 @@ def initial_block(name):
         return "c" + name[1]
     return name[:2]
 
-root = pathlib.Path(".")
-(root / "m").mkdir()
-(root / "f").mkdir()
+root = pathlib.Path("../work")
+#(root / "m").mkdir()
+#(root / "f").mkdir()
 
 fds = {}
 writers = {}
@@ -54,9 +66,6 @@ for t in df.itertuples():
         fds[pair] = fd
         writers[pair] = writer
     writer.writerow(t)
-
-
-# In[ ]:
 
 for fd in fds.values():
     fd.close()
