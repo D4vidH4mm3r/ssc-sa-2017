@@ -21,3 +21,8 @@ def initial_block(name):
     if name[0] in "sz":
         return "c"
     return name[0]
+
+def chunks(l, n):
+    """Yield successive n-sized chunks from l."""
+    for i in range(0, len(l), n):
+        yield l[i:i + n]
