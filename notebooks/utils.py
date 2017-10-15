@@ -8,7 +8,7 @@ def extractYear(s):
     return int(re.search(r"\d{4}", s).group(0))
 
 # location of data - change on local machine maybe
-datadir = pathlib.Path("../data")
+datadir = pathlib.Path("../../data")
 
 _common_hard_c = set(("cristen", "cristian", "cristine", "carlotte", "catrine",
                     "carl", "caroline", "cathrine", "cirstine", "carel", "catarine"))
