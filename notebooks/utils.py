@@ -5,7 +5,10 @@ import re
 
 
 def extractYear(s):
-    return int(re.search(r"\d{4}", s).group(0))
+    match = re.search(r"\d{4}", s)
+    if match is None:
+        return None
+    return int(match.group(0))
 
 # location of data - change on local machine maybe
 datadir = pathlib.Path("../../data")
