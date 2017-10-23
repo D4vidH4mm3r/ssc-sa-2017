@@ -4,49 +4,64 @@ import getch
 import random
 
 
-cwd = pathlib.Path(".")
-approved_file = cwd / "matches.csv"
-discard_file = cwd / "notmatches.csv"
+link_dir = pathlib.Path("data") / "links"
+data_dir = pathlib.Path("matches")
+approved_file = link_dir / "matches.csv"
+discard_file = link_dir / "notmatches.csv"
 
-input_file = random.choice(list((cwd / "matches").iterdir()))
+input_file = random.choice(list(data_dir.iterdir()))
 
-header = "pandas|FT|Amt|Herred|Sogn|Navn|Køn|Fødested|Fødeår|Civilstand|Position|Erhverv|Kipnr|Løbenr".split("|")
+header = "pandas|FT|Amt|Herred|Sogn|Navn|Køn|Fødested|Fødeår|Civilstand|Position|Erhverv|Kipnr|Løbenr|Group".split("|")
 
 # see https://stackoverflow.com/questions/8924173/how-do-i-print-bold-text-in-python
 class color:
-   PURPLE = '\033[95m'
-   CYAN = '\033[96m'
-   DARKCYAN = '\033[36m'
-   BLUE = '\033[94m'
-   GREEN = '\033[92m'
-   YELLOW = '\033[93m'
-   RED = '\033[91m'
-   BOLD = '\033[1m'
-   UNDERLINE = '\033[4m'
-   END = '\033[0m'
+    PURPLE = '\033[95m'
+    CYAN = '\033[96m'
+    DARKCYAN = '\033[36m'
+    BLUE = '\033[94m'
+    GREEN = '\033[92m'
+    YELLOW = '\033[93m'
+    RED = '\033[91m'
+    BOLD = '\033[1m'
+    UNDERLINE = '\033[4m'
+    END = '\033[0m'
 
 
 seen = set()
 
 def nowISee(row):
-    seen.add(tuple(row[-2:]))
+    ft = row[1]
+    kip = row[-3]
+    løb = row[-2]
+    seen.add((ft, kip, løb))
 
 def alreadySeen(row):
-    return tuple(row[-2:]) in seen
+    ft = row[1]
+    kip = row[-3]
+    løb = row[-2]
+    return (ft, kip, løb) in seen
 
 def seeItAll(fn):
+    # verified match files have different format
+    # linkID, kilde, kip, løb, tabel, navn, faarb
     with fn.open("r", encoding="utf-8") as fd:
         reader = csv.reader(fd)
+        next(reader)
         for row in reader:
-            nowISee(row)
-
+            ft = row[1]
+            kip = row[2]
+            løb = row[3]
+            # TODO: handle given links also
+            seen.add((ft, kip, løb))
 
 seeItAll(approved_file)
 seeItAll(discard_file)
 
-with input_file.open("r", encoding="utf-8") as fin, \
-     approved_file.open("a", encoding="utf-8") as fapprove, \
-     discard_file.open("a", encoding="utf-8") as fdiscard:
+print(seen)
+print("TODO: Update!")
+sys.exit()
+
+with input_file.open("r", encoding="utf-8") as fin, approved_file.open("a", encoding="utf-8") as fapprove, discard_file.open("a", encoding="utf-8") as fdiscard:
     reader = csv.reader(fin)
     writer_approve = csv.writer(fapprove)
     writer_discard = csv.writer(fdiscard)
