@@ -8,17 +8,9 @@ import utils
 
 
 print("Loading data for", sys.argv[1])
-subset = pandas.read_csv(sys.argv[1],
-                         delimiter="|",
-                         low_memory=False,
-                         converters={
-                             "FT": int,
-                             "Navn": str,
-                             "Fødeår": int, # some are "", will be removed later
-                             "Fødested": str # here, there are errors, too
-                         })
+subset = pandas.read_pickle(sys.argv[1])
 fn = pathlib.Path(sys.argv[1])
-work = pathlib.Path("../work")
+work = pathlib.Path("/work/sdusscsa2")
 fout = ((work / "matches") / fn.name)
 print("Will write matches to", fout)
 by_year = subset.groupby("FT")
