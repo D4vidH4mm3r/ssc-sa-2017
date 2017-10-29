@@ -3,9 +3,11 @@ import random
 import itertools
 
 
+print("Loading golden standard")
 matches = pd.read_csv(str(utils.datadir / "links" / "matches.csv"), sep="|")
-
+print("Loading big dataframe")
 df = pd.read_pickle("dataframe.pickled")
+print("Doing some indexing")
 df.dropna(subset=("Fødeår",), inplace=True)
 df.set_index(["FT", "Kipnr", "Løbenr"], inplace=True)
 df.sort_index(inplace=True)
@@ -35,16 +37,19 @@ def generate_nonmatch_scores(_):
         lots.append(score(a,b) + (False,))
     return lots
 
+print("Compute scores for random non-matches")
 with multiprocessing.Pool() as p:
     res = p.map(generate_nonmatch_scores, [None for i in range(multiprocessing.cpu_count())])
 
-positive = utils.parallelize(matches[:3000], to_scored_frame)
 negative = pd.DataFrame(list(itertools.chain(*res)), columns=score_columns + ["label"])
-
 del(res)
+print("Compute scores for some good matches")
+positive = utils.parallelize(matches[:3000], to_scored_frame)
 
 df_train = pd.concat([positive, negative])
+df_train.dropna(inplace=True)
 
+print("Train some models")
 # # Train and evaluate models
 
 # ## Linear model
