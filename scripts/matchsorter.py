@@ -27,17 +27,20 @@ class color:
 # find known matches; index by left guy
 print("Starting by reading accepted matches so we don't see them again")
 seen = {}
-tmp = pd.read_csv("good.csv", delimiter="|")
-for t in tmp.itertuples():
-    seen[(t.a_FT, t.a_Kipnr, t.a_Løbenr)] = (t.b_FT, t.b_Kipnr, t.b_Løbenr)
+for fn in ("good.csv", "data/links/matches.csv"):
+    print(fn)
+    tmp = pd.read_csv(str(fn), delimiter="|", comment="//")
+    for t in tmp.itertuples():
+        seen[(t.a_FT, t.a_Kipnr, t.a_Løbenr)] = (t.b_FT, t.b_Kipnr, t.b_Løbenr)
 
+print("And also remember already rejected matches")
 rejected = {}
-tmp = pd.read_csv("bad.csv", delimiter="|")
+tmp = pd.read_csv("bad.csv", delimiter="|", comment="//")
 for t in tmp.itertuples():
     rejected[(t.a_FT, t.a_Kipnr, t.a_Løbenr)] = (t.b_FT, t.b_Kipnr, t.b_Løbenr)
 
 # to look stuff up in
-print("Reading in data")
+print("Reading in big data file")
 lookup = pd.read_pickle("experiments/scripts/dataframe.pickled")
 print("Indexing...")
 lookup.set_index(["FT", "Kipnr", "Løbenr"], inplace=True)
@@ -46,7 +49,7 @@ lookup.sort_index(inplace=True)
 
 # the matches to review
 print("Now getting list of matches")
-matches = pd.read_csv(str(input_file), delimiter="|")
+matches = pd.read_csv(str(input_file), delimiter="|", comment="//")
 matches.sort_values(by="p", ascending=False, inplace=True)
 
 # for printing
