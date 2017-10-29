@@ -38,7 +38,7 @@ def generate_nonmatch_scores(_):
 with multiprocessing.Pool() as p:
     res = p.map(generate_nonmatch_scores, [None for i in range(multiprocessing.cpu_count())])
 
-positive = utils.parallelize(matches, to_scored_frame)
+positive = utils.parallelize(matches[:3000], to_scored_frame)
 negative = pd.DataFrame(list(itertools.chain(*res)), columns=score_columns + ["label"])
 
 del(res)
