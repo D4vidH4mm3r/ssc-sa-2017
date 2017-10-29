@@ -10,8 +10,7 @@ import utils
 print("Loading data for", sys.argv[1])
 subset = pandas.read_pickle(sys.argv[1])
 fn = pathlib.Path(sys.argv[1])
-work = pathlib.Path("/work/sdusscsa2")
-fout = ((work / "matches") / fn.name)
+fout = (utils.workdir / "matches") / fn.name
 print("Will write matches to", fout)
 by_year = subset.groupby("FT")
 
