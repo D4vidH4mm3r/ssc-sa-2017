@@ -1,10 +1,15 @@
+#!/opt/sys/apps/python/3.6.0/bin/python
+
 from network import *
 import recordlinkage
 import utils
 import itertools
 import sys
+import pathlib
+import time
 
 
+start = time.time()
 # # Read some subset to match
 print("Loading dataset from", sys.argv[1])
 df = pd.read_pickle(sys.argv[1])
@@ -53,3 +58,6 @@ with fout.open("w", encoding="utf-8") as fd:
     writer = csv.writer(fd, lineterminator="\n", delimiter="|")
     writer.writerow("a_FT a_Kipnr a_Løbenr b_FT b_Kipnr b_Løbenr p".split())
     writer.writerows(potential_matches)
+
+elapsed = time.time() - start
+print("Spent", elapsed, "seconds on this")
