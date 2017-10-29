@@ -41,7 +41,7 @@ for t in tmp.itertuples():
 
 # to look stuff up in
 print("Reading in big data file")
-lookup = pd.read_pickle("dataframe.pickled")
+lookup = pd.read_pickle("experiments/scripts/dataframe.pickled")
 print("Indexing...")
 lookup.set_index(["FT", "Kipnr", "Løbenr"], inplace=True)
 print("Sorting...")
