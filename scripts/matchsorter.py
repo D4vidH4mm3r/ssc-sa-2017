@@ -50,7 +50,8 @@ lookup.sort_index(inplace=True)
 # the matches to review
 print("Now getting list of matches")
 matches = pd.read_csv(str(input_file), delimiter="|", comment="#")
-matches.sort_values(by="p", ascending=False, inplace=True)
+# consider sorting (to see mostly good or mostly bad)
+#matches.sort_values(by="p", ascending=False, inplace=True)
 
 # for printing
 header = "Amt|Herred|Sogn|Navn|Køn|Fødested|Fødeår|Civilstand|Position|Erhverv|Kipnr|Løbenr|Group".split("|")
