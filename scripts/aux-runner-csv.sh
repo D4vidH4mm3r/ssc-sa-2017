@@ -12,5 +12,5 @@
 readarray -t files < $1
 index=$(($2+SLURM_ARRAY_TASK_ID-1))
 file=${files[$index]}
-echo "csvrunner: $HOSTNAME runs $index, that is $file"
+echo "runner (csv): $HOSTNAME runs $index, that is $file"
 $3 $file

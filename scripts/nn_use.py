@@ -1,6 +1,6 @@
 #!/opt/sys/apps/python/3.6.0/bin/python
 
-from network import *
+from nn_common import *
 import recordlinkage
 import utils
 import itertools

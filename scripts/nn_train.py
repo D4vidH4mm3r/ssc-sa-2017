@@ -1,4 +1,6 @@
-from network import *
+#!/opt/sys/apps/python/3.6.0/bin/python
+
+from nn_common import *
 import random
 import itertools
 
