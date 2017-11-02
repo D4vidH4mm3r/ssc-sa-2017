@@ -322,6 +322,9 @@ df["FonetiskFødested"] = utils.parallelize(df.Fødested, make_keys)
 
 
 pandas.to_pickle(df, "dataframe.pickled")
+df.set_index(["FT", "Kipnr", "Løbenr"], inplace=True)
+df.sort_index(inplace=True)
+pandas.to_pickle(df, "indexed.pickled")
 
 
 # # Continue!
