@@ -17,7 +17,6 @@ fn = pathlib.Path(sys.argv[1])
 fout = (utils.workdir / "nn-match") / (fn.stem + ".csv")
 
 grouped = df.groupby("FT")
-indexer = recordlinkage.indexing.SortedNeighbourhoodIndex(on="Fødeår", window=5)
 
 def generate_scores(d):
     lots = []
@@ -36,6 +35,7 @@ for year, data in grouped:
     dfB = data
     if dfA is not None:
         print("Now try", yearA, "with", len(dfA), "vs", yearB, "with", len(dfB))
+        indexer = recordlinkage.indexing.SortedNeighbourhoodIndex(on="Fødeår", window=3)
         index = indexer.index(dfA, dfB)
         print("Index of size", len(index))
         with multiprocessing.Pool() as p:
