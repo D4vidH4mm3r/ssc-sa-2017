@@ -1,6 +1,6 @@
 #! /bin/bash
 #
-#SBATCH --account sdusscsa2_gpu
+#SBATCH --account sdusscsa2_slim
 #SBATCH --nodes 1
 #SBATCH --time 24:00:00
 
