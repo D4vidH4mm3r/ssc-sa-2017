@@ -1,3 +1,5 @@
+#!/opt/sys/apps/python/3.6.0/bin/python
+
 from network import *
 import random
 import itertools
