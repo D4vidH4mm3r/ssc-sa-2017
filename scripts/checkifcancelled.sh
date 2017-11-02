@@ -1,6 +1,6 @@
 #!/bin/bash
 for f in "$@"; do
-  grep "CANCELLED" $f -q
+  grep "error\|CANCELLED" $f -q
   if [[ $? -eq 0 ]]; then
     echo "$f was apparently cancelled"
     s=$(head -n 1 $f)
