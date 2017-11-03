@@ -3,6 +3,7 @@
 from nn_common import *
 import random
 import itertools
+import multiprocessing
 
 
 print("Loading golden standard")
