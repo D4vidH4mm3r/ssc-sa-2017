@@ -288,7 +288,32 @@ df.Løbenr = df.Løbenr.apply(lambda s: s.split(",")[0] if "," in s else s).asty
 # In[ ]:
 
 
-df
+def extract_fornavn(s):
+    s = s.replace(".", " ")
+    return s.split()[0]
+
+
+# In[ ]:
+
+
+df["Fornavn"] = df.Navn.apply(extract_fornavn)
+
+
+# In[ ]:
+
+
+import metaphone
+
+
+# In[ ]:
+
+
+def make_keys(names):
+    def f(s):
+        return metaphone.doublemetaphone(s.translate(utils.trans))[0]
+    return names.apply(f)
+df["FonetiskNavn"] = utils.parallelize(df.Navn, make_keys)
+df["FonetiskFødested"] = utils.parallelize(df.Fødested, make_keys)
 
 
 # # Checkpoint!
@@ -296,11 +321,12 @@ df
 # In[ ]:
 
 
-pandas.to_pickle(df, "dataframee.pickled")
+pandas.to_pickle(df, "dataframe.pickled")
+df.set_index(["FT", "Kipnr", "Løbenr"], inplace=True)
+df.sort_index(inplace=True)
+pandas.to_pickle(df, "indexed.pickled")
 
 
-# In[ ]:
+# # Continue!
 
-
-#df = pandas.read_pickle("tmp.pickled")
-
+# df = pandas.read_pickle("tmp.pickled")
