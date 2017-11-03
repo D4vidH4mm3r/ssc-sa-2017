@@ -40,5 +40,5 @@ print("Starting the processing")
 with concurrent.futures.ProcessPoolExecutor(max_workers=48) as tpe:
     data = tpe.map(to_scored_frame, utils.chunks(matches, 500))
 
-df = pd.DataFrame(list(itertools.chain(*data)), columns=score_columns+["labels"])
+df = pd.DataFrame(list(itertools.chain(*data)), columns=score_columns+["label"])
 df.to_csv(str(utils.workdir / "scores-positive.csv"))
