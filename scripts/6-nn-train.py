@@ -17,8 +17,8 @@ negative = pd.read_csv(str(utils.workdir / "scores-negative.csv"), dtype=dtypes)
 negative.dropna(inplace=True)
 print("Done loading")
 
-df_train = pd.concat([positive[:2000], negative[:10000]])
-df_eval = pd.concat([positive[-2000:], negative[-10000:]])
+df_train = pd.concat([positive[:-1000], negative[:-2000]])
+df_eval = pd.concat([positive[-1000:], negative[-2000:]])
 
 # Train and evaluate models
 print("Train some models")
