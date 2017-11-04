@@ -35,9 +35,11 @@ for fn in ("good.csv", "data/links/matches.csv"):
 
 print("And also remember already rejected matches")
 rejected = {}
-tmp = pd.read_csv("bad.csv", delimiter="|", comment="#")
-for t in tmp.itertuples():
-    rejected[(t.a_FT, t.a_Kipnr, t.a_Løbenr)] = (t.b_FT, t.b_Kipnr, t.b_Løbenr)
+for fn in ("bad.csv", "data/links/nonmatches.csv"):
+    print(fn)
+    tmp = pd.read_csv(fn, delimiter="|", comment="#")
+    for t in tmp.itertuples():
+        rejected[(t.a_FT, t.a_Kipnr, t.a_Løbenr)] = (t.b_FT, t.b_Kipnr, t.b_Løbenr)
 
 # to look stuff up in
 print("Reading in big data file")
