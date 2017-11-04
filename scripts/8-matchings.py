@@ -5,13 +5,14 @@ import pathlib
 import concurrent.futures
 import utils
 import itertools
+import csv
 
 
 # cutoff for probability suggested by NN; any links below this are not considered
 THRESHOLD = 0.7
 
-print("Loading data for", sys.argv[1])
-df = pd.read_csv(sys.argv[1], delimiter="|", dtype={
+# just for reading stuff
+dtypes = {
     "a_FT": int,
     "a_Kipnr": str,
     "a_Løbenr": int,
@@ -19,33 +20,39 @@ df = pd.read_csv(sys.argv[1], delimiter="|", dtype={
     "b_Kipnr": str,
     "b_Løbenr": int,
     "p": float
-})
-fn = pathlib.Path(sys.argv[1])
-fout = (utils.workdir / "nn-graph-matching") / fn.name
-print("Will write matches to", fout)
+}
+fout = utils.workdir / "nn-plus-matching.csv"
+fdir = pathlib.Path(sys.argv[1])
 
-by_year = df.groupby("a_FT")
-def make_matching(arg):
-    a_FT, data = arg
-    print(a_FT)
-    print("There are", len(data), "proposed links")
-    G = nx.Graph()
-    for t in data.itertuples():
-        a = t[1:4]
-        b = t[4:7]
-        p = t.p
-        if p > THRESHOLD:
-            G.add_edge(a, b, weight=p)
-    print("Added", G.number_of_edges(), "edges from this")
-    print("Calculating max-weight-matching...")
-    match = nx.max_weight_matching(G, maxcardinality=False)
-    match = sorted(set(tuple(sorted(item)) for item in match.items()),
-                   key=lambda x: G[x[0]][x[1]]["weight"],
-                   reverse=True)
-    for pair in match:
-        print(pair)
+def process_file(fn):
+    print("Loading data for", fn)
+    df = pd.read_csv(fn, delimiter="|", dtype=dtypes)
 
-with concurrent.futures.ProcessPoolExecutor() as tpe:
-    res = tpe.map(make_matching, by_year)
+    by_year = df.groupby("a_FT")
+    res = []
+    for a_FT, data in by_year:
+        print("Start", fn, "on", a_FT)
+        #print("There are", len(data), "proposed links")
+        G = nx.Graph()
+        for t in data.itertuples():
+            a = t[1:4]
+            b = t[4:7]
+            p = t.p
+            if p > THRESHOLD:
+                G.add_edge(a, b, weight=p)
+        #print("Added", G.number_of_edges(), "edges from this")
+        #print("Calculating max-weight-matching...")
+# TODO: recover and save p for match (for further study)
+        match = nx.max_weight_matching(G, maxcardinality=False)
+        #print("Match had", len(match), "elems")
+        res.append(list(match.items()))
+    return itertools.chain(*res)
 
-print(list(res))
+with concurrent.futures.ProcessPoolExecutor(max_workers=48) as tpe:
+    res = tpe.map(process_file, list(fdir.iterdir()))
+
+with fout.open("w", encoding="utf-8") as fd:
+    writer = csv.writer(fd, lineterminator="\n", delimiter="|")
+    writer.writerow("a_FT a_Kipnr a_Løbenr b_FT b_Kipnr b_Løbenr p".split())
+    for (a, b) in (itertools.chain(*res)):
+        writer.writerow(a + b)
