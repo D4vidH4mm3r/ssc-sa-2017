@@ -4,12 +4,13 @@ import sys
 import pathlib
 import concurrent.futures
 import utils
-import itertools
 import csv
+import multiprocessing
 
 
+print("Initializing")
 # cutoff for probability suggested by NN; any links below this are not considered
-THRESHOLD = 0.7
+THRESHOLD = 0.8
 
 # just for reading stuff
 dtypes = {
@@ -23,16 +24,16 @@ dtypes = {
 }
 fout = utils.workdir / "nn-plus-matching.csv"
 fdir = pathlib.Path(sys.argv[1])
+m = multiprocessing.Manager()
+Q = m.Queue(maxsize=100)
 
 def process_file(fn):
     print("Loading data for", fn)
     df = pd.read_csv(fn, delimiter="|", dtype=dtypes)
 
     by_year = df.groupby("a_FT")
-    res = []
     for a_FT, data in by_year:
-        print("Start", fn, "on", a_FT)
-        #print("There are", len(data), "proposed links")
+        print("Start", fn, "on", a_FT, "with", len(data), "links")
         G = nx.Graph()
         for t in data.itertuples():
             a = t[1:4]
@@ -45,14 +46,27 @@ def process_file(fn):
 # TODO: recover and save p for match (for further study)
         match = nx.max_weight_matching(G, maxcardinality=False)
         #print("Match had", len(match), "elems")
-        res.append(list(match.items()))
-    return itertools.chain(*res)
+        Q.put(list(match.items()))
+    Q.put("done")
 
-with concurrent.futures.ProcessPoolExecutor(max_workers=48) as tpe:
-    res = tpe.map(process_file, list(fdir.iterdir()))
+print("Starting process pool executor")
+with concurrent.futures.ProcessPoolExecutor(max_workers=47) as tpe, \
+        fout.open("w", encoding="utf-8") as fd:
+    todo = list(fdir.iterdir())
+    print("Submit all the", len(todo), "things to map")
+    _ = tpe.map(process_file, todo)
 
-with fout.open("w", encoding="utf-8") as fd:
     writer = csv.writer(fd, lineterminator="\n", delimiter="|")
     writer.writerow("a_FT a_Kipnr a_Løbenr b_FT b_Kipnr b_Løbenr p".split())
-    for (a, b) in (itertools.chain(*res)):
-        writer.writerow(a + b)
+    done = 0
+    while True:
+        print("Get something from queue...")
+        res = Q.get()
+        print("Got", res[:5], flush=True)
+        if res == "done":
+            done += 1
+            if done == len(todo):
+                break
+        else:
+            for (a, b) in res:
+                writer.writerow(a + b)
