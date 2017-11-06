@@ -37,7 +37,7 @@ def score(a, b):
             ss_pair(a.FonetiskNavn, b.FonetiskNavn), # metaphone pair
             ss(a.Fødested, b.Fødested),
             ss_pair(a.FonetiskFødested, b.FonetiskFødested), # metaphone pair
-            ss(a.Civilstand, b.Civilstand), # TODO: as categorigal transition
+            a.Civilstand + b.Civilstand,
             ss(a.Position, b.Position),
             ss(a.Erhverv, b.Erhverv),
             1.0 if a.Køn == b.Køn else 0.0,
@@ -50,7 +50,7 @@ fornavn  = tf.feature_column.numeric_column("r_fname")
 fonetisknavn = tf.feature_column.numeric_column("r_fonname")
 fødested = tf.feature_column.numeric_column("r_birthp")
 fonetiskfødested = tf.feature_column.numeric_column("r_fonbirth")
-civilstand = tf.feature_column.numeric_column("r_civil")
+civilstand = tf.feature_column.categorical_column_with_vocabulary_list("t_civil", list(a+b for (a,b) in itertools.product("uges?", repeat=2)))
 position = tf.feature_column.numeric_column("r_pos")
 erhverv = tf.feature_column.numeric_column("r_job")
 køn = tf.feature_column.numeric_column("m_gender")
