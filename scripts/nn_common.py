@@ -16,16 +16,28 @@ def ss(a: str, b: str):
     b = b.lower().translate(utils.trans)
     if a==b:
         return 0
-    return editdistance.eval(a, b) / ((len(a) + len(b))/2)
+    return editdistance.eval(a, b) / max(len(a), len(b))
+
+def ss_pair(A, B):
+    # for metaphone string pairs
+    best = 1
+    for a in A:
+        if a == "":
+            continue
+        for b in B:
+            if b == "":
+                continue
+            best = min(best, ss(a, b))
+    return best
 
 score_columns="r_name r_fname r_fonname r_birthp r_fonbirth r_civil r_pos r_job m_gender d_birthy".split(" ")
 def score(a, b):
     return (ss(a.Navn, b.Navn),
             ss(a.Fornavn, b.Fornavn),
-            ss(a.FonetiskNavn, b.FonetiskNavn),
+            ss_pair(a.FonetiskNavn, b.FonetiskNavn), # metaphone pair
             ss(a.Fødested, b.Fødested),
-            ss(a.FonetiskFødested, b.FonetiskFødested),
-            ss(a.Civilstand, b.Civilstand), # denne er dum; lav om
+            ss_pair(a.FonetiskFødested, b.FonetiskFødested), # metaphone pair
+            ss(a.Civilstand, b.Civilstand), # TODO: as categorigal transition
             ss(a.Position, b.Position),
             ss(a.Erhverv, b.Erhverv),
             1.0 if a.Køn == b.Køn else 0.0,
