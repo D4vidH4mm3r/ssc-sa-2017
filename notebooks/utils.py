@@ -5,6 +5,7 @@ import re
 import numpy as np
 import multiprocessing
 import pandas as pd
+import platform
 
 
 def extractYear(s):
@@ -14,7 +15,10 @@ def extractYear(s):
     return int(match.group(0))
 
 # location of data - change on local machine maybe
-workdir = pathlib.Path("/work/sdusscsa2")
+if platform.node() in ("daviddesktop", "davidlaptop"):
+    workdir = pathlib.Path("/home/david/ssc")
+else:
+    workdir = pathlib.Path("/work/sdusscsa2")
 datadir = workdir / "data"
 
 _common_hard_c = set(("cristen", "cristian", "cristine", "carlotte", "catrine",
