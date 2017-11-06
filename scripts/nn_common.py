@@ -6,6 +6,7 @@ import pandas as pd
 import utils
 import editdistance
 import csv
+import itertools
 
 
 def ss(a: str, b: str):
@@ -30,7 +31,7 @@ def ss_pair(A, B):
             best = min(best, ss(a, b))
     return best
 
-score_columns="r_name r_fname r_fonname r_birthp r_fonbirth r_civil r_pos r_job m_gender d_birthy".split(" ")
+score_columns="r_name r_fname r_fonname r_birthp r_fonbirth t_civil r_pos r_job m_gender d_birthy".split(" ")
 def score(a, b):
     return (ss(a.Navn, b.Navn),
             ss(a.Fornavn, b.Fornavn),
@@ -50,7 +51,9 @@ fornavn  = tf.feature_column.numeric_column("r_fname")
 fonetisknavn = tf.feature_column.numeric_column("r_fonname")
 fødested = tf.feature_column.numeric_column("r_birthp")
 fonetiskfødested = tf.feature_column.numeric_column("r_fonbirth")
-civilstand = tf.feature_column.categorical_column_with_vocabulary_list("t_civil", list(a+b for (a,b) in itertools.product("uges?", repeat=2)))
+civilstand = tf.feature_column.categorical_column_with_vocabulary_list(
+  "t_civil",
+  list(a+b for (a,b) in itertools.product("uges?", repeat=2)))
 position = tf.feature_column.numeric_column("r_pos")
 erhverv = tf.feature_column.numeric_column("r_job")
 køn = tf.feature_column.numeric_column("m_gender")
@@ -65,6 +68,7 @@ model1 = tf.estimator.LinearClassifier(feature_columns=[
 # # Or other model
 
 model2 = tf.estimator.DNNClassifier(feature_columns=[
-    navn, fornavn, fonetisknavn, fødested, fonetiskfødested, civilstand, position, erhverv, køn, fødeår
+    navn, fornavn, fonetisknavn, fødested, fonetiskfødested,
+    tf.feature_column.indicator_column(civilstand), position, erhverv, køn, fødeår
 ], model_dir="model2", hidden_units=[7,5,3])
 

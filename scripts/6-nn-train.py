@@ -10,6 +10,7 @@ print("Loading scores")
 print("First for positive matches")
 dtypes = {c: np.float64 for c in score_columns}
 dtypes["label"] = bool
+dtypes["t_civil"] = str
 positive = pd.read_csv(str(utils.workdir / "scores-positive.csv"), dtype=dtypes)
 positive.dropna(inplace=True)
 print("And then for negative matches")
@@ -29,7 +30,7 @@ input_fn_eval = tf.estimator.inputs.pandas_input_fn(x=df_eval, y=df_eval.label, 
 
 # Linear model
 print("First a simple linear model")
-model1.train(input_fn=input_fn_train)
+#model1.train(input_fn=input_fn_train)
 print(model1.evaluate(input_fn=input_fn_train))
 
 # DNN model
