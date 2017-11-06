@@ -109,6 +109,16 @@ def extract_fornavn(s):
 
 df["Fornavn"] = df.Navn.apply(extract_fornavn)
 
+df.Civilstand = df.Civilstand.astype(str)
+def extract_civil(s):
+    s = s.lower().translate(utils.trans)[:1]
+    if s == "f": # fraskilt probably
+        return "s" # skilt
+    if s == "" or s not in "uges":
+        return "?"
+    return s
+df.Civilstand = df.Civilstand.apply(extract_civil)
+
 import metaphone
 
 def make_keys(names):
