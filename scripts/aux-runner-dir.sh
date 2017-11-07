@@ -8,6 +8,7 @@
 # arg 1 should be dir with many files and stuff
 # arg 2 should be offset (stuff handled by other jobs)
 
+module load python/3.6.0
 files=($1/*)
 index=$(($2+SLURM_ARRAY_TASK_ID-1))
 file=${files[$index]}
