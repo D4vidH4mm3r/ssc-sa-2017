@@ -17,8 +17,8 @@ def make_keys(names):
     return names.apply(f)
 
 print("Apply grouping function")
-df["G1"] = df.FonetiskFornavn.apply(lambda x: x[0][:3])
-df["G2"] = df.FonetiskFornavn.apply(lambda x: x[1][:3])
+df["G1"] = df.FonetiskFornavn.apply(lambda x: x[0])
+df["G2"] = df.FonetiskFornavn.apply(lambda x: x[1])
 
 print("Do the groupby and write")
 for g in ("G1", "G2"):

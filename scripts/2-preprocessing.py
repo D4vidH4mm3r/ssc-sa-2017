@@ -109,7 +109,7 @@ def extract_fornavn(s):
 
 def extract_efternavn(s):
     s = s.replace(".", " ")
-    return s.split()[1:]
+    return " ".join(s.split()[1:])
 
 df["Fornavn"] = df.Navn.apply(extract_fornavn)
 df["Efternavn"] = df.Navn.apply(extract_efternavn)
