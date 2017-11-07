@@ -127,6 +127,7 @@ def make_keys(names):
     return names.apply(f)
 
 df["FonetiskNavn"] = utils.parallelize(df.Navn, make_keys)
+df["FonetiskFornavn"] = utils.parallelize(df.Fornavn, make_keys)
 df["FonetiskFødested"] = utils.parallelize(df.Fødested, make_keys)
 print("Saving")
 pandas.to_pickle(df, "dataframe.pickled")
