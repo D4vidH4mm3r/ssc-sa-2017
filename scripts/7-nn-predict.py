@@ -13,7 +13,7 @@ import multiprocessing
 start = time.time()
 # # Read some subset to match
 print("Loading dataset from", sys.argv[1])
-df = pd.read_pickle(sys.argv[1])
+df = pd.read_csv(sys.argv[1])
 fn = pathlib.Path(sys.argv[1])
 fout = (utils.workdir / "nn-match") / (fn.stem + ".csv")
 
