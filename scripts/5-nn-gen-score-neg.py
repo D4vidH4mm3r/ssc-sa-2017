@@ -12,7 +12,7 @@ df = pd.read_pickle("indexed.pickled")
 
 years = [1845, 1850, 1860, 1880, 1885]
 
-ssize = 10000
+ssize = 100000
 def generate_nonmatch_scores(_):
     lots = []
     s = df.loc[random.choice(years)].sample(ssize)

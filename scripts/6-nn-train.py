@@ -30,7 +30,7 @@ input_fn_eval = tf.estimator.inputs.pandas_input_fn(x=df_eval, y=df_eval.label, 
 
 # Linear model
 print("First a simple linear model")
-#model1.train(input_fn=input_fn_train)
+model1.train(input_fn=input_fn_train)
 print(model1.evaluate(input_fn=input_fn_train))
 
 # DNN model
