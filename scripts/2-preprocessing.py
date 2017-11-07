@@ -107,7 +107,12 @@ def extract_fornavn(s):
     s = s.replace(".", " ")
     return s.split()[0]
 
+def extract_efternavn(s):
+    s = s.replace(".", " ")
+    return s.split()[1:]
+
 df["Fornavn"] = df.Navn.apply(extract_fornavn)
+df["Efternavn"] = df.Navn.apply(extract_efternavn)
 
 df.Civilstand = df.Civilstand.astype(str)
 def extract_civil(s):
@@ -128,6 +133,7 @@ def make_keys(names):
 
 df["FonetiskNavn"] = utils.parallelize(df.Navn, make_keys)
 df["FonetiskFornavn"] = utils.parallelize(df.Fornavn, make_keys)
+df["FonetiskEfternavn"] = utils.parallelize(df.Efternavn, make_keys)
 df["FonetiskFødested"] = utils.parallelize(df.Fødested, make_keys)
 print("Saving")
 pandas.to_pickle(df, "dataframe.pickled")
