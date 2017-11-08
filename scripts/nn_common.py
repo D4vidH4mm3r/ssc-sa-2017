@@ -47,7 +47,7 @@ def score(a, b):
 # # Build features
 
 navn = tf.feature_column.numeric_column("r_name")
-fornavn  = tf.feature_column.numeric_column("r_fname")
+fornavn = tf.feature_column.numeric_column("r_fname")
 fonetisknavn = tf.feature_column.numeric_column("r_fonname")
 fødested = tf.feature_column.numeric_column("r_birthp")
 fonetiskfødested = tf.feature_column.numeric_column("r_fonbirth")
