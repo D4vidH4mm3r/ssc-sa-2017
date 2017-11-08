@@ -40,4 +40,4 @@ for (gender, prefix1), data1 in df.groupby(["Køn", "G1"]):
             else: # split even further
                 for prefix3, data3 in data2.groupby(["G3"]):
                     print("   ", prefix3, "has size", len(data3))
-                    savegroup((gender, prefix1, prefix2), data2)
+                    savegroup((gender, prefix1, prefix2, prefix3), data3)
