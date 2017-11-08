@@ -25,7 +25,7 @@ for (( i=0; i<= $numarrays; i++ )); do
     dostart=$((remaining>permaxarray?permaxarray:remaining)) # how many to start now; take min
     arraylen=$(((dostart+chunksize-1)/chunksize))
     echo "Starting array number $i with $dostart files (will have array indices 1-$arraylen) and offset $numstarted"
-    sbatch --array=1-$arraylen aux-runner-dir.sh $program $dir $chunksize $numstarted
+    sbatch --array=1-$arraylen aux-runner-dir.job $program $dir $chunksize $numstarted
     remaining=$((remaining-dostart))
     numstarted=$((numstarted+dostart))
 done
