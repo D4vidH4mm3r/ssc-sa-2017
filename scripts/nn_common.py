@@ -31,7 +31,7 @@ def ss_pair(A, B):
             best = min(best, ss(a, b))
     return best
 
-score_columns="r_name r_fname r_fonname r_birthp r_fonbirth t_civil r_pos r_job m_gender d_birthy".split(" ")
+score_columns="r_name r_fname r_fonname r_birthp r_fonbirth t_civil r_pos r_job m_gender d_birthy m_amt m_herred m_sogn".split(" ")
 def score(a, b):
     return (ss(a.Navn, b.Navn),
             ss(a.Fornavn, b.Fornavn),
@@ -42,7 +42,10 @@ def score(a, b):
             ss(a.Position, b.Position),
             ss(a.Erhverv, b.Erhverv),
             1.0 if a.Køn == b.Køn else 0.0,
-            abs(a.Fødeår - b.Fødeår))
+            abs(a.Fødeår - b.Fødeår),
+            a.Amt == b.Amt,
+            a.Herred == b.Herred,
+            a.Sogn == b.Sogn)
 
 # # Build features
 
@@ -72,3 +75,28 @@ model2 = tf.estimator.DNNClassifier(feature_columns=[
     tf.feature_column.indicator_column(civilstand), position, erhverv, køn, fødeår
 ], model_dir="model2", hidden_units=[7,5,3])
 
+# Or combined model
+
+deep_columns = [
+    navn, fornavn, fonetisknavn, fødested, fonetiskfødested,
+    tf.feature_column.indicator_column(civilstand), position, erhverv, køn, fødeår
+]
+
+position_buckets = tf.feature_column.bucketized_column(
+        position, boundaries=[0.1,0.4,0.7])
+name_buckets = tf.feature_column.bucketized_column(
+        fonetisknavn, boundaries=[0.1,0.4,0.7])
+crossed_columns = [
+        tf.feature_column.crossed_column(
+            [civilstand, name_buckets], hash_bucket_size=100),
+        tf.feature_column.crossed_column(
+            [civilstand, position_buckets], hash_bucket_size=100),
+        tf.feature_column.crossed_column(
+            [civilstand, "m_amt", "m_herred", "m_sogn"], hash_bucket_size=300)
+]
+
+model3 = tf.estimator.DNNLinearCombinedClassifier(
+        model_dir="model3",
+        linear_feature_columns=crossed_columns,
+        dnn_feature_columns=deep_columns,
+        dnn_hidden_units=[10, 5])

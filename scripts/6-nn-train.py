@@ -37,3 +37,8 @@ print(model1.evaluate(input_fn=input_fn_train))
 print("Then a DNN")
 model2.train(input_fn_train)
 print(model2.evaluate(input_fn_train))
+
+# DNN model
+print("Finally, combined model!")
+model3.train(input_fn_train)
+print(model3.evaluate(input_fn_train))
