@@ -10,6 +10,8 @@ shopt -s nullglob # so empty dirs count as 0
 maxarray=1000 # depends on slurm config; 1000 for Abacus
 
 program=$1
+simple="${program%.*}" # strips extension
+simple="${simple#*-}" # strips leading n-
 dir=$2
 chunksize=$3
 permaxarray=$((maxarray*chunksize))
@@ -25,7 +27,7 @@ for (( i=0; i<= $numarrays; i++ )); do
     dostart=$((remaining>permaxarray?permaxarray:remaining)) # how many to start now; take min
     arraylen=$(((dostart+chunksize-1)/chunksize))
     echo "Starting array number $i with $dostart files (will have array indices 1-$arraylen) and offset $numstarted"
-    sbatch --array=1-$arraylen aux-runner-dir.job $program $dir $chunksize $numstarted
+    sbatch -o "slurm-${simple}-%j.out" -J "$simple" --array=1-$arraylen aux-runner-dir.job $program $dir $chunksize $numstarted
     remaining=$((remaining-dostart))
     numstarted=$((numstarted+dostart))
 done
