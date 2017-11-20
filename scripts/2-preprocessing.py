@@ -21,7 +21,7 @@ df = pandas.read_csv(str(utils.datadir / "clean"/ "complete.csv"),
 
 print("Before dropping stupid NaN fields", len(df))
 df.dropna(subset=["Fødested", "Navn", "Fødeår", "Køn"], inplace=True)
-len(df)
+print("After:", len(df))
 
 def maybeInSogn(s):
     s = s.lower().strip()
@@ -30,8 +30,8 @@ def maybeInSogn(s):
             re.search(r"h(er|\.)? i s", s) is not None
 
 sogn = df.Fødested.apply(maybeInSogn)
+print("Updating birthplace to parish for", len(df[sogn]), "rows")
 df.loc[sogn, "Fødested"] = df.Sogn
-sogn = df[df.Fødested.str.contains("sogn", case=False)]
 del(sogn)
 
 # ## Part two: change "ditto" or "do" into previous
@@ -44,7 +44,7 @@ for r in df.itertuples():
     else:
         prev = r.Fødested
 
-print("Updating birthplace for", len(replacements), "entries")
+print("Updating birthplace to previous (ditto) for", len(replacements), "rows")
 indices, values = zip(*replacements)
 df.loc[list(indices), "Fødested"] = list(values)
 
@@ -89,7 +89,7 @@ def guessGender(s):
         return "M"
     return "?"
 df.Køn = df.Køn.astype(str).apply(guessGender)
-df.Køn.value_counts()
+print(df.Køn.value_counts())
 
 print("Before dropping rows lacking gender:", len(df))
 df.drop(df[df.Køn=="?"].index, inplace=True)
@@ -136,6 +136,7 @@ df["FonetiskFornavn"] = utils.parallelize(df.Fornavn, make_keys)
 df["FonetiskEfternavn"] = utils.parallelize(df.Efternavn, make_keys)
 df["FonetiskFødested"] = utils.parallelize(df.Fødested, make_keys)
 print("Saving")
+print("Remaining:", len(df))
 pandas.to_pickle(df, "dataframe.pickled")
 df.set_index(["FT", "Kipnr", "Løbenr"], inplace=True)
 df.sort_index(inplace=True)
